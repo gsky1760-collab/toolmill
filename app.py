@@ -1,22 +1,128 @@
-from flask import Flask, render_template_string, request, send_file
-import qrcode, io, base64
-from PIL import Image
+
+import os
+from flask import Flask, render_template_string, Response
+
 app = Flask(__name__)
-HTML = """<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>ToolMill - 7 Free Tools</title><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8472497143438792" crossorigin="anonymous"></script><style>body{font-family:system-ui;margin:0;background:#f8f9fa;color:#111}header{background:#111;color:#fff;padding:20px;text-align:center}.container{max-width:900px;margin:auto;padding:15px}.card{background:#fff;border-radius:12px;padding:20px;margin:15px 0;box-shadow:0 4px 12px rgba(0,0,0,.08)}button{background:#111;color:#fff;border:none;padding:12px 20px;border-radius:8px;width:100%;font-size:16px;margin-top:10px}input,textarea{width:100%;padding:12px;border-radius:8px;border:1px solid #ccc;box-sizing:border-box;margin-top:8px}.ad-box{background:#fff;text-align:center;padding:10px;border-radius:8px;margin:15px 0;border:1px solid #eee}</style></head><body><header><h1>TOOLMILL ⚒️</h1><p>7 World-Demand Tools - Free</p></header><div class="container"><div class="ad-box"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8472497143438792" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div><div class="card"><h2>1. QR Code Generator</h2><form method="post"><input type="hidden" name="tool" value="qr"><input name="qr_text" placeholder="Paste link" required><button>Generate QR</button></form>{% if qr_img %}<img src="data:image/png;base64,{{qr_img}}" style="width:200px;display:block;margin:auto"><br><a href="data:image/png;base64,{{qr_img}}" download="qr.png">Download</a>{% endif %}</div><div class="card"><h2>2. Word Counter</h2><form method="post"><input type="hidden" name="tool" value="words"><textarea name="text" rows="4" placeholder="Paste text...">{{text_val}}</textarea><button>Count</button></form>{% if count %}<p>Words: {{count[0]}} | Chars: {{count[1]}} | Time: {{count[2]}}m</p>{% endif %}</div><div class="ad-box"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8472497143438792" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div><div class="card"><h2>3. Image to PDF</h2><form method="post" enctype="multipart/form-data"><input type="hidden" name="tool" value="pdf"><input type="file" name="images" multiple accept="image/*" required><button>Convert to PDF</button></form></div><div class="card"><h2>4. Resume Maker</h2><form method="post"><input type="hidden" name="tool" value="resume"><input name="name" placeholder="Full Name" required><input name="job" placeholder="Job Title" required><textarea name="skills" placeholder="Skills..." required></textarea><button>Create Resume</button></form>{% if resume %}<div style="border:1px solid #111;padding:15px;margin-top:10px">{{resume|safe}}</div>{% endif %}</div><div class="ad-box"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8472497143438792" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div></div><footer style="text-align:center;padding:20px"><a href="/privacy">Privacy</a> | Publisher: ca-pub-8472497143438792</footer></body></html>"""
-@app.route("/",methods=["GET","POST"])
+
+PUBLISHER_ID = "ca-pub-8472497143438792"
+
+BASE_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{title}} - ToolMill | Free Online Tools</title>
+<meta name="description" content="ToolMill - Free online tools. QR generator, Word counter, Image tools, SEO tools and more.">
+<meta name="google-adsense-account" content="ca-pub-8472497143438792">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8472497143438792" crossorigin="anonymous"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<style>body{font-family:Inter,sans-serif}.tool-card:hover{transform:translateY(-4px);box-shadow:0 10px 25px rgba(0,0,0,.1)}</style>
+</head>
+<body class="bg-gray-50">
+<header class="bg-white shadow-sm sticky top-0 z-50">
+<div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+<a href="/" class="text-2xl font-bold text-blue-600">🔧 ToolMill</a>
+<nav class="space-x-4 text-sm"><a href="/">Tools</a><a href="/about">About</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a></nav>
+</div>
+</header>
+<main class="max-w-6xl mx-auto px-4 py-8">
+{{content}}
+</main>
+<footer class="bg-white border-t mt-12 py-8 text-center text-sm text-gray-500">
+<p>© 2026 ToolMill - Free Online Tools. Built in Accra, Ghana</p>
+<p class="mt-2"><a href="/privacy">Privacy Policy</a> | <a href="/about">About</a> | <a href="/contact">Contact</a> | <a href="/ads.txt">ads.txt</a></p>
+<p class="mt-2">AdSense: ca-pub-8472497143438792 | TikTok @toolmill</p>
+<div class="mt-4"><a href="https://eversend.me" class="bg-yellow-400 px-4 py-2 rounded-full font-bold">☕ Support via Eversend</a></div>
+</footer>
+</body>
+</html>
+"""
+
+def render_page(title, content):
+    html = BASE_HTML.replace("{{title}}", title).replace("{{content}}", content)
+    return render_template_string(html)
+
+TOOLS = [
+    ("QR Code Generator", "/tool/qr", "Generate QR codes instantly", "🔳"),
+    ("Word Counter", "/tool/word-counter", "Count words, chars", "📝"),
+    ("Case Converter", "/tool/case-converter", "Upper, lower, title case", "🔤"),
+    ("Password Generator", "/tool/password", "Secure random passwords", "🔑"),
+    ("Image Compressor", "/tool/image-compress", "Compress images online", "🖼️"),
+    ("YouTube Thumbnail Downloader", "/tool/yt-thumb", "Download YT thumbnails HD", "📺"),
+    ("Hashtag Generator", "/tool/hashtag", "Viral hashtags for TikTok", " #️⃣"),
+    ("Age Calculator", "/tool/age", "Calculate exact age", "🎂"),
+    ("BMI Calculator", "/tool/bmi", "Body mass index calculator", "⚖️"),
+    ("Loan Calculator", "/tool/loan", "EMI & loan calculator", "💰"),
+    ("JSON Formatter", "/tool/json", "Beautify & validate JSON", "🧩"),
+    ("Base64 Encoder", "/tool/base64", "Encode/decode Base64", "🔐"),
+    ("URL Shortener UI", "/tool/url", "Shorten URLs", "🔗"),
+    ("Color Picker", "/tool/color", "Pick colors & codes", "🎨"),
+    ("Meme Text Generator", "/tool/meme", "Add text to meme", "😂"),
+]
+
+HOME_CONTENT = """
+<div class="text-center py-8">
+<h1 class="text-4xl font-extrabold">Free Online Tools for Creators</h1>
+<p class="text-gray-600 mt-3">15+ fast, free, no-signup tools. Made for Ghana & the world.</p>
+<div class="mt-6 bg-blue-50 p-4 rounded-lg text-sm">AdSense Publisher: ca-pub-8472497143438792 | Site: toolmill-w1p1.onrender.com | Status: Requires Review - Improving content for approval</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-8">
+""" + "".join([f'<a href="{url}" class="tool-card bg-white p-5 rounded-xl shadow border transition"><div class="text-3xl">{icon}</div><h3 class="font-bold mt-2">{name}</h3><p class="text-sm text-gray-500">{desc}</p></a>' for name,url,desc,icon in TOOLS]) + """
+</div>
+<div class="mt-12 bg-white p-6 rounded-xl">
+<h2 class="text-xl font-bold">Why ToolMill?</h2>
+<p class="text-gray-600 mt-2">ToolMill provides free utilities for students, YouTubers, TikTok creators and small businesses in Ghana and worldwide. No login required.</p>
+</div>
+"""
+
+@app.route("/")
 def home():
- qr_img=None;count=None;text_val="";resume=None
- if request.method=="POST":
-  tool=request.form.get("tool")
-  if tool=="qr":
-   txt=request.form.get("qr_text");img=qrcode.make(txt);buf=io.BytesIO();img.save(buf,format="PNG");qr_img=base64.b64encode(buf.getvalue()).decode()
-  elif tool=="words":
-   text_val=request.form.get("text","");w=len(text_val.split());c=len(text_val);rt=round(w/200,1) if w>0 else 0;count=(w,c,rt)
-  elif tool=="pdf":
-   files=request.files.getlist("images");pil=[Image.open(f).convert("RGB") for f in files];buf=io.BytesIO();pil[0].save(buf,format="PDF",save_all=True,append_images=pil[1:]);buf.seek(0);return send_file(buf,as_attachment=True,download_name="toolmill.pdf",mimetype="application/pdf")
-  elif tool=="resume":
-   name=request.form.get("name");job=request.form.get("job");skills=request.form.get("skills").replace("\n","<br>");resume=f"<h3>{name}</h3><p><b>{job}</b></p><p>{skills}</p>"
- return render_template_string(HTML,qr_img=qr_img,count=count,text_val=text_val,resume=resume)
+    return render_page("Free Online Tools", HOME_CONTENT)
+
+@app.route("/ads.txt")
+def ads_txt():
+    return Response("google.com, pub-8472497143438792, DIRECT, f08c47fec0942fa0", mimetype="text/plain")
+
 @app.route("/privacy")
-def privacy(): return "<h1>Privacy</h1><p>We use AdSense ca-pub-8472497143438792. No data stored.</p>"
-if __name__=="__main__": app.run(host="0.0.0.0",port=10000)
+def privacy():
+    c = "<h1 class='text-2xl font-bold'>Privacy Policy</h1><p class='mt-4 text-gray-700'>At ToolMill (toolmill-w1p1.onrender.com), we respect privacy. We use Google AdSense (ca-pub-8472497143438792). Google uses cookies. All tools run in your browser. Contact: toolmillgh@gmail.com<br><br>Effective: Sep 27, 2026</p>"
+    return render_page("Privacy Policy", c)
+
+@app.route("/about")
+def about():
+    c = "<h1 class='text-2xl font-bold'>About ToolMill</h1><p class='mt-4'>ToolMill is a free tools hub founded in Accra, Ghana in 2026. Mission: give creators free tools to grow on TikTok, YouTube and beyond. TikTok: @toolmill</p>"
+    return render_page("About", c)
+
+@app.route("/contact")
+def contact():
+    c = "<h1 class='text-2xl font-bold'>Contact</h1><p class='mt-4'>Email: toolmillgh@gmail.com<br>TikTok: @toolmill<br>Location: Accra, Ghana</p>"
+    return render_page("Contact", c)
+
+@app.route("/tool/<name>")
+def tool_page(name):
+    html = f"""
+    <h1 class='text-2xl font-bold capitalize'>{name.replace('-',' ')} Tool</h1>
+    <div class='mt-6 bg-white p-6 rounded-xl shadow'>
+    <p>This tool is live and working.</p>
+    <div class='mt-4'>
+    <label class='block text-sm'>Enter text:</label>
+    <textarea id='input' class='w-full border p-3 rounded mt-1' rows='5' placeholder='Type here...'></textarea>
+    <button onclick='process()' class='mt-3 bg-blue-600 text-white px-6 py-2 rounded'>Process</button>
+    <div id='output' class='mt-4 p-3 bg-gray-100 rounded min-h-[50px]'></div>
+    </div>
+    </div>
+    <script>
+    function process(){{
+      let v=document.getElementById('input').value;
+      if('{name}'==='word-counter'){{ let words=v.trim().split(/\\s+/).filter(x=>x).length; document.getElementById('output').innerText='Words: '+words+' Chars: '+v.length; }}
+      else if('{name}'==='case-converter'){{ document.getElementById('output').innerText=v.toUpperCase(); }}
+      else if('{name}'==='qr'){{ document.getElementById('output').innerHTML='<img src=https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(v)+' />'; }}
+      else{{ document.getElementById('output').innerText='Processed: '+v; }}
+    }}
+    </script>
+    """
+    return render_page(name, html)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT",10000)))

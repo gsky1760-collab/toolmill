@@ -88,3 +88,18 @@ def admin():
 
 if __name__=="__main__":
     app.run(host="0.0.0.0", port=10000)
+@app.route("/about")
+def about():
+    return base_html("About Us", "<div class='bg-white p-6 rounded-xl'><h1 class='font-black text-xl'>About ToolMillMALL.GH</h1><p class='mt-4 text-sm leading-6'>ToolMillMALL.GH is Ghana's trusted online marketplace founded in 2024 in Accra. We provide authentic Electronics, Fashion, Groceries and Home Appliances at affordable prices. Our mission is to make online shopping easy for every Ghanaian with Pay on Delivery and Mobile Money. We deliver to Accra, Kumasi, Takoradi, Tamale within 24-48 hours. Customer satisfaction is our priority.</p></div>")
+
+@app.route("/contact")
+def contact():
+    return base_html("Contact", "<div class='bg-white p-6 rounded-xl'><h1 class='font-bold'>Contact Us</h1><p class='mt-4 text-sm'>WhatsApp: 0556023536<br>Email: toolmillgh@gmail.com<br>Location: Accra, Greater Accra<br>Hours: Mon-Sat 8am-6pm</p><a href='https://wa.me/233556023536' class='mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded-full'>Chat on WhatsApp</a></div>")
+
+@app.route("/privacy")
+def privacy():
+    return base_html("Privacy Policy", "<div class='bg-white p-6 rounded-xl text-xs leading-5'><h1 class='font-bold text-lg'>Privacy Policy</h1><p class='mt-4'>At ToolMillMALL.GH we respect your privacy. We collect only name, phone, address for order delivery. We never share your data. We use cookies for cart. Mobile Money transactions are secure via MTN/Vodafone. You can request data deletion via WhatsApp 0556023536.</p></div>")
+
+@app.route("/shipping")
+def shipping():
+    return base_html("Shipping", "<div class='bg-white p-6 rounded-xl text-sm'><h1 class='font-bold'>Shipping & Returns</h1><p class='mt-4'>Free delivery in Accra over GHS 500. Standard delivery GHS 30-50. Delivery 1-2 days Accra, 2-4 days other regions. 7 days return for defective items.</p></div>")

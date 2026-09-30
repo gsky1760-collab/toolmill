@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect
 import base64
 app = Flask(__name__)
-WHATSAPP_NUMBER = "233 55 602 3536"
+WHATSAPP_NUMBER = "233556023536"
 PRODUCTS = [
     {"id":1,"name":"iPhone 15 Pro Max 256GB","price":18500,"old":21000,"cat":"Electronics","img":"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400","stock":15},
     {"id":2,"name":"Samsung Galaxy A54","price":4200,"old":4800,"cat":"Electronics","img":"https://images.unsplash.com/photo-1610945265064-0e34e03294be?w=400","stock":20},
@@ -50,6 +50,14 @@ def cart_page():
     </script>
     """
     return base_html("Cart", html)
+@app.route("/admin/delete/<int:pid>")
+def delete_product(pid):
+    pwd = request.args.get("pwd")
+    if pwd!= "admin123":
+        return "Wrong password"
+    global PRODUCTS
+    PRODUCTS = [p for p in PRODUCTS if p['id']!= pid]
+    return redirect(f"/admin?pwd=admin123")
 @app.route("/admin", methods=["GET","POST"])
 def admin():
     if request.method=="POST":
@@ -67,9 +75,4 @@ def admin():
             return redirect("/admin?ok=1&pwd=admin123")
     ok=request.args.get("ok")
     msg="<div class='bg-green-100 p-3 rounded mb-3'>✅ Added!</div>" if ok else ""
-    rows="".join([f"<tr class='border-b text-xs'><td class='p-2'><img src='{p['img']}' class='w-10 h-10 object-cover'></td><td class='p-2'>{p['name'][:20]}</td><td class='p-2'>GHS {p['price']}</td></tr>" for p in PRODUCTS[::-1][:20]])
-    html=f"<h1 class='font-bold'>Admin</h1>{msg}<div class='grid md:grid-cols-2 gap-4 mt-4'><div class='bg-white p-5 rounded-xl shadow'><form method='POST' enctype='multipart/form-data' class='space-y-3'><input type='hidden' name='pwd' value='admin123'><input name='name' placeholder='Product Name' class='w-full p-3 border rounded' required><input name='price' type='number' placeholder='Price GHS' class='w-full p-3 border rounded' required><input name='old' type='number' placeholder='Old Price' class='w-full p-3 border rounded'><select name='cat' class='w-full p-3 border rounded'><option>Electronics</option><option>Fashion</option><option>Food</option><option>Home</option><option>Beauty</option></select><input type='file' name='file' class='w-full p-2 border rounded'><input name='img_url' placeholder='OR paste https:// image URL' class='w-full p-3 border rounded'><button class='w-full bg-black text-white py-3 rounded-full font-bold'>Add Product</button></form></div><div class='bg-white p-4 rounded-xl shadow'><h2 class='font-bold'>Products ({len(PRODUCTS)})</h2><table class='w-full'>{rows}</table><a href='/' class='block mt-4 text-center bg-blue-600 text-white py-2 rounded-full'>View Shop</a></div></div>"
-    if not request.args.get("pwd") and request.method=="GET":
-        html="<h1 class='font-black text-xl'>Admin Login</h1><div class='bg-white p-6 rounded-xl shadow mt-4 max-w-sm'><form method='POST'><input name='pwd' type='password' placeholder='Password: admin123' class='w-full p-3 border rounded' required><button class='w-full mt-3 bg-black text-white py-3 rounded-full'>Login</button></form></div>"
-    return base_html("Admin", html)
-if __name__=="__main__": app.run(host="0.0.0.0", port=10000)
+    rows="".join([f"<tr class='border-b text-xs'><td class='p-2'><img src='{p['img']}' class='w-10 h-10 object-cover'></td><td class='p-2'>{p['name

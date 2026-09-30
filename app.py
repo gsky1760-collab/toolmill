@@ -3,103 +3,51 @@ import base64
 app = Flask(__name__)
 WHATSAPP_NUMBER = "233556023536"
 PRODUCTS = [
-    {"id":1,"name":"iPhone 15 Pro Max 256GB","price":18500,"old":21000,"cat":"Electronics","img":"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400","stock":15},
-    {"id":2,"name":"Samsung Galaxy A54","price":4200,"old":4800,"cat":"Electronics","img":"https://images.unsplash.com/photo-1610945265064-0e34e03294be?w=400","stock":20},
-    {"id":3,"name":"GTP African Print 6 Yards","price":450,"old":550,"cat":"Fashion","img":"https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400","stock":100},
-    {"id":4,"name":"5kg Lele Rice","price":180,"old":220,"cat":"Food","img":"https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?w=400","stock":50},
-    {"id":5,"name":"Infinix Hot 40 Pro","price":2200,"old":2600,"cat":"Electronics","img":"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400","stock":30},
-    {"id":6,"name":"Adidas Sneakers","price":650,"old":850,"cat":"Fashion","img":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400","stock":40},
-    {"id":7,"name":"Nasco 50 Inch Smart TV","price":3800,"old":4500,"cat":"Electronics","img":"https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400","stock":10},
-    {"id":8,"name":"Ghana Black Soap 1kg","price":80,"old":100,"cat":"Beauty","img":"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400","stock":200},
-    {"id":9,"name":"Straight dress","price":200,"old":300,"cat":"Fashion","img":"https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400","stock":20},
+    {"id":1,"name":"iPhone 15 Pro Max 256GB","price":18500,"old":21000,"cat":"Electronics","img":"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400","desc":"Brand new iPhone 15 Pro Max 256GB with Apple warranty. Original from USA. Face ID, 48MP camera, Titanium body. Delivery in Accra same day."},
+    {"id":2,"name":"Samsung Galaxy A54 5G 128GB","price":4200,"old":4800,"cat":"Electronics","img":"https://images.unsplash.com/photo-1610945265064-0e34e03294be?w=400","desc":"Samsung A54 with 120Hz AMOLED display, 50MP OIS camera, 5000mAh battery. 2 years warranty. Best mid-range phone in Ghana 2024."},
+    {"id":3,"name":"GTP African Print 6 Yards Original","price":450,"old":550,"cat":"Fashion","img":"https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400","desc":"Original GTP African Print 6 yards. 100% cotton, doesn't fade. Perfect for funeral, wedding, church. Available in many colors."},
+    {"id":4,"name":"Lele Rice 5kg Premium Long Grain","price":180,"old":220,"cat":"Food","img":"https://images.unsplash.com/photo-1536304929831-ee1ca9d44906?w=400","desc":"Lele 5kg premium long grain rice. Clean, stone-free, delicious. Ghana's favorite rice for Jollof and Fried Rice. Expiry 2026."},
+    {"id":5,"name":"Infinix Hot 40 Pro 256GB","price":2200,"old":2600,"cat":"Electronics","img":"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400","desc":"Infinix Hot 40 Pro 256GB + 8GB RAM, 108MP camera, Helio G99, 5000mAh. Free pouch and screen protector."},
+    {"id":6,"name":"Adidas Running Sneakers White Size 40-45","price":650,"old":850,"cat":"Fashion","img":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400","desc":"Original Adidas sneakers for running and casual. Very comfortable, breathable mesh. Size 40 to 45 available in Accra shop."},
+    {"id":7,"name":"Nasco 50 Inch Smart TV UHD 4K","price":3800,"old":4500,"cat":"Electronics","img":"https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400","desc":"Nasco 50 inch Smart TV with Netflix, YouTube, HDMI, USB. 4K UHD display. 2 years warranty. Free wall bracket."},
+    {"id":8,"name":"Ghana Black Soap 1kg Organic Original","price":80,"old":100,"cat":"Beauty","img":"https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=400","desc":"Original Ghana black soap 1kg for skin glow, acne, dark spots. Natural ingredients, no chemicals. Made in Ghana."},
+    {"id":9,"name":"Ladies Straight Dress Red Elegant Long","price":200,"old":300,"cat":"Fashion","img":"https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400","desc":"Beautiful ladies straight long dress for office, church, wedding. Red color, free size M-XL. High quality material."},
+    {"id":10,"name":"Men's Sneakers Black Leather Classic","price":350,"old":450,"cat":"Fashion","img":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400","desc":"Classic men's black leather sneakers for all occasions. Durable sole, comfortable inner. Sizes 40-45."},
+    {"id":11,"name":"Women's Handbag Luxury Leather Brown","price":280,"old":350,"cat":"Fashion","img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400","desc":"Luxury women's handbag brown leather with chain. Fits phone, makeup, wallet. Imported quality."},
+    {"id":12,"name":"School Bag Backpack Waterproof","price":220,"old":280,"cat":"Fashion","img":"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400","desc":"Durable school bag backpack waterproof for JHS, SHS, University. Many compartments, laptop space."},
+    {"id":13,"name":"Bluetooth Speaker JBL Boombox Bass","price":300,"old":400,"cat":"Electronics","img":"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400","desc":"JBL Bluetooth speaker super bass, 12 hours battery, waterproof. Connects to phone via Bluetooth 5.0."},
+    {"id":14,"name":"Ladies Wig Human Hair 14 Inch Curly","price":550,"old":700,"cat":"Beauty","img":"https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400","desc":"100% human hair wig 14 inch curly, can be straightened, dyed. Free wig cap. Very soft and natural."},
+    {"id":15,"name":"Men's T-Shirt Cotton 3-Pack Plain","price":150,"old":200,"cat":"Fashion","img":"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400","desc":"3 pieces men's cotton T-shirts black white gray. Original cotton, no fading. Sizes M-XXL."},
+    {"id":16,"name":"Non-Stick Cooking Pot Set 6 Pcs","price":480,"old":600,"cat":"Home","img":"https://images.unsplash.com/photo-1585837070886-15dd8e8a54c5?w=400","desc":"6 pieces non-stick pot set for cooking. Gas and electric compatible. Easy to clean, doesn't stick."},
+    {"id":17,"name":"Perfume 100ml Long Lasting Unisex","price":120,"old":180,"cat":"Beauty","img":"https://images.unsplash.com/photo-1541643600914-78b084683601?w=400","desc":"100ml unisex perfume long lasting 24 hours. Nice fragrance for men and women. Imported from Dubai."},
+    {"id":18,"name":"Wireless Earbuds TWS Pro 6","price":180,"old":250,"cat":"Electronics","img":"https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=400","desc":"TWS Pro 6 wireless earbuds with charging case, 30 hours battery, clear sound, touch control."},
+    {"id":19,"name":"Kids Sneakers Size 30-35 Light Up","price":200,"old":260,"cat":"Fashion","img":"https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=400","desc":"Kids light up sneakers size 30-35. Beautiful colors, comfortable for school and playing."},
+    {"id":20,"name":"Gas Cooker 2 Burner Stainless Steel","price":650,"old":800,"cat":"Home","img":"https://images.unsplash.com/photo-1556911220-bff31c812dba?w=400","desc":"2 burner gas cooker stainless steel, auto ignition, strong burner. For home and outdoor."},
+    {"id":21,"name":"Makeup Kit 12 Colors Professional","price":250,"old":320,"cat":"Beauty","img":"https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400","desc":"Professional makeup kit 12 colors eyeshadow + lipstick + powder. For beginners and pros."},
+    {"id":22,"name":"Office Chair Executive Leather","price":950,"old":1200,"cat":"Home","img":"https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400","desc":"Executive office chair leather, adjustable height, comfortable for long hours. Imported quality."},
+    {"id":23,"name":"32GB Pen Drive Original SanDisk","price":90,"old":120,"cat":"Electronics","img":"https://images.unsplash.com/photo-1592899677977-9bb10ba128a5?w=400","desc":"SanDisk 32GB original pen drive high speed USB 3.0. For phone, laptop, TV."},
+    {"id":24,"name":"Bed Sheet 4x6 Cotton + 2 Pillows","price":180,"old":230,"cat":"Home","img":"https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=400","desc":"4x6 cotton bed sheet with 2 pillow cases. Soft, colorful, doesn't fade after washing."},
+    {"id":25,"name":"Men's Watch Luxury Gold Leather","price":400,"old":550,"cat":"Fashion","img":"https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=400","desc":"Luxury men's gold watch with leather strap, water resistant, date display. Classy for office."},
+    {"id":26,"name":"Electric Iron Philips Steam","price":320,"old":400,"cat":"Home","img":"https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400","desc":"Philips steam iron 2000W fast ironing, non-stick soleplate, 2 years warranty."},
+    {"id":27,"name":"Ladies Slippers Soft Comfortable","price":120,"old":160,"cat":"Fashion","img":"https://images.unsplash.com/photo-1603808033587-9359428479d1?w=400","desc":"Ladies soft slippers for home and outdoor, comfortable sole, many colors available."},
+    {"id":28,"name":"Power Bank 20000mAh Fast Charge","price":250,"old":320,"cat":"Electronics","img":"https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400","desc":"20000mAh power bank fast charge, charges 4 phones. LED display, dual USB."},
+    {"id":29,"name":"Baby Diapers Molfix Size 3 60pcs","price":180,"old":220,"cat":"Home","img":"https://images.unsplash.com/photo-1540479859555-17af45c78602?w=400","desc":"Molfix baby diapers size 3 (6-10kg) 60 pieces. Dry and comfortable, no leakage."},
+    {"id":30,"name":"Laptop HP 15 Core i5 8GB RAM","price":4500,"old":5200,"cat":"Electronics","img":"https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400","desc":"HP Laptop 15 inch Core i5, 8GB RAM, 256GB SSD, Windows 11. For school and office. UK used, neat."},
 ]
 
 def base_html(title, content):
-    html = "<!DOCTYPE html><html><head><title>"+title+"</title><meta name='viewport' content='width=device-width, initial-scale=1'><script src='https://cdn.tailwindcss.com'></script></head><body class='bg-gray-100'>"
-    html += "<header class='bg-white shadow sticky top-0 z-50'><div class='bg-blue-700 text-white text-center py-1 text-xs'>Free Delivery Accra over GHS 500</div>"
-    html += "<nav class='max-w-7xl mx-auto p-3 flex justify-between items-center'><a href='/' class='font-black text-xl text-blue-700'>ToolMill<span class='text-orange-500'>MALL</span>.GH</a><div class='flex gap-3 text-sm'><a href='/'>Home</a><a href='/cart'>Cart</a><a href='/admin?pwd=admin123' class='bg-black text-white px-3 py-1 rounded-full'>Admin</a></div></nav></header>"
-    html += "<main class='max-w-7xl mx-auto p-3'>"+content+"</main></body></html>"
+    html = f"<!DOCTYPE html><html><head><title>{title} - ToolMillMALL.GH Ghana's Biggest Mall</title><meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='Ghana biggest online mall - Electronics, Fashion, Food, Beauty. Delivery Accra Kumasi. WhatsApp 0556023536'><script src='https://cdn.tailwindcss.com'></script></head><body class='bg-gray-100'>"
+    html += "<header class='bg-white shadow sticky top-0 z-50'><div class='bg-blue-700 text-white text-center py-1 text-xs'>Free Delivery in Accra over GHS 500 | WhatsApp: 0556023536 | Pay on Delivery</div>"
+    html += "<nav class='max-w-7xl mx-auto p-3 flex justify-between items-center'><a href='/' class='font-black text-xl text-blue-700'>ToolMill<span class='text-orange-500'>MALL</span>.GH</a><div class='flex gap-2 text-xs items-center'><a href='/' class='font-bold'>Home</a><a href='/about'>About</a><a href='/contact'>Contact</a><a href='/cart'>Cart (<span id='cc'>0</span>)</a><a href='/admin?pwd=admin123' class='bg-black text-white px-3 py-1 rounded-full'>Admin</a></div></nav></header>"
+    html += f"<main class='max-w-7xl mx-auto p-3'>{content}</main><footer class='bg-black text-white mt-10 p-6 text-center text-xs'><div class='flex justify-center gap-3 mb-3'><a href='/about'>About Us</a><a href='/contact'>Contact</a><a href='/privacy'>Privacy Policy</a><a href='/shipping'>Shipping</a><a href='/terms'>Terms</a></div><p>ToolMillMALL.GH is Ghana's trusted online marketplace since 2024. We sell authentic products with warranty. Location: Accra, Greater Accra, Ghana. Email: toolmillgh@gmail.com WhatsApp: 0556023536. Delivery across Ghana.</p><p class='mt-2'>© 2026 ToolMillMALL.GH - All Rights Reserved</p></footer><script>let cart=JSON.parse(localStorage.getItem('tm_cart')||'[]');let el=document.getElementById('cc');if(el)el.innerText=cart.length;</script></body></html>"
     return html
 
 @app.route("/ads.txt")
-def ads():
-    return "google.com, pub-8472497143438792, DIRECT, f08c47fec0942fa0", 200, {'Content-Type':'text/plain'}
+def ads(): return "google.com, pub-8472497143438792, DIRECT, f08c47fec0942fa0", 200, {'Content-Type':'text/plain'}
 
 @app.route("/")
 def home():
-    grid = "<div class='bg-gradient-to-r from-blue-600 to-orange-500 text-white p-5 rounded-xl mb-4'><h1 class='text-2xl font-black'>GHANA'S BIGGEST MALL</h1></div><div class='grid grid-cols-2 md:grid-cols-4 gap-3'>"
+    grid = "<div class='bg-gradient-to-r from-blue-600 to-orange-500 text-white p-6 rounded-xl mb-4'><h1 class='text-2xl font-black'>GHANA'S BIGGEST ONLINE MALL</h1><p class='text-sm mt-2'>30+ Original Products | Electronics | Fashion | Food | Beauty | Home | Pay on Delivery | 0556023536</p><p class='text-xs mt-2'>Trusted by 1000+ Ghanaians in Accra, Kumasi, Takoradi, Tamale. Same day delivery Accra.</p></div>"
+    grid += "<div class='grid grid-cols-2 md:grid-cols-4 gap-3'>"
     for p in PRODUCTS:
-        grid += "<div class='bg-white rounded-xl shadow overflow-hidden'><img src='"+p['img']+"' class='w-full h-40 object-cover'><div class='p-3'><h3 class='font-bold text-xs'>"+p['name']+"</h3><b class='text-blue-700 text-sm'>GHS "+str(p['price'])+"</b><br><a href='/add/"+str(p['id'])+"' class='mt-2 inline-block bg-orange-500 text-white px-4 py-1 rounded-full text-xs'>Add to Cart</a></div></div>"
-    grid += "</div>"
-    return base_html("ToolMillMALL", grid)
-
-@app.route("/add/<int:pid>")
-def add_cart(pid):
-    return "<script>let cart=JSON.parse(localStorage.getItem('tm_cart')||'[]');let products="+str(PRODUCTS).replace("'","\"")+";let p=products.find(x=>x.id=="+str(pid)+");cart.push(p);localStorage.setItem('tm_cart',JSON.stringify(cart));alert(p.name+' added!');window.location='/';</script>"
-
-@app.route("/cart")
-def cart_page():
-    html = """
-    <h1 class='font-bold'>Your Cart</h1><div id='list' class='bg-white p-4 rounded-xl mt-4'></div>
-    <div class='bg-white p-4 rounded-xl mt-4'><input id='n' placeholder='Your Name' class='w-full p-3 border rounded mb-2'><input id='m' placeholder='MoMo Number' class='w-full p-3 border rounded mb-2'><input id='a' placeholder='Address' class='w-full p-3 border rounded mb-2'><button onclick='sendWA()' class='w-full bg-green-600 text-white py-3 rounded-full'>Order via WhatsApp to 0556023536</button></div>
-    <script>
-    let cart=JSON.parse(localStorage.getItem('tm_cart')||'[]');let el=document.getElementById('list');let tot=0;el.innerHTML='';if(cart.length==0){el.innerHTML='Empty'}else{cart.forEach(p=>{tot+=p.price;el.innerHTML+='<div>'+p.name+' - GHS '+p.price+'</div>'});el.innerHTML+='<b>Total: GHS '+tot+'</b>';}
-    function sendWA(){let name=document.getElementById('n').value;let momo=document.getElementById('m').value;let addr=document.getElementById('a').value;let msg='*NEW ORDER*%0AName: '+name+'%0AMoMo: '+momo+'%0AAddr: '+addr+'%0A';cart.forEach(p=>{msg+='- '+p.name+'%0A'});window.open('https://wa.me/233556023536?text='+msg,'_blank');}
-    </script>
-    """
-    return base_html("Cart", html)
-
-@app.route("/admin/delete/<int:pid>")
-def delete_prod(pid):
-    if request.args.get("pwd") != "admin123":
-        return "Wrong pwd"
-    global PRODUCTS
-    PRODUCTS = [p for p in PRODUCTS if p["id"] != pid]
-    return redirect("/admin?pwd=admin123")
-
-@app.route("/admin", methods=["GET","POST"])
-def admin():
-    if request.method=="POST":
-        if request.form.get("pwd")!="admin123":
-            return "Wrong password"
-        name=request.form.get("name")
-        price=request.form.get("price")
-        cat=request.form.get("cat")
-        img=request.form.get("img_url")
-        file=request.files.get("file")
-        if file and file.filename!="":
-            data=file.read()
-            b64=base64.b64encode(data).decode("utf-8")
-            mime=file.mimetype or "image/jpeg"
-            img="data:"+mime+";base64,"+b64
-        if name and price:
-            nid=max([p["id"] for p in PRODUCTS])+1 if PRODUCTS else 1
-            PRODUCTS.append({"id":nid,"name":name,"price":int(price),"old":int(price)+100,"cat":cat,"img":img,"stock":20})
-        return redirect("/admin?pwd=admin123&ok=1")
-    ok=request.args.get("ok")
-    msg="<div class='bg-green-100 p-2 rounded mb-2'>Added!</div>" if ok else ""
-    rows=""
-    for p in PRODUCTS[::-1]:
-        rows+="<tr class='border-b text-xs'><td class='p-2'><img src='"+p["img"]+"' class='w-10 h-10'></td><td class='p-2'>"+p["name"][:20]+"</td><td class='p-2'>GHS "+str(p["price"])+"</td><td class='p-2'><a href='/admin/delete/"+str(p["id"])+"?pwd=admin123' class='bg-red-500 text-white px-2 py-1 rounded'>Delete</a></td></tr>"
-    html=msg+"<h1 class='font-bold'>Admin - "+str(len(PRODUCTS))+" Products</h1><div class='bg-white p-4 rounded-xl mt-4'><form method='POST' enctype='multipart/form-data'><input type='hidden' name='pwd' value='admin123'><input name='name' placeholder='Name' class='w-full p-2 border rounded mb-2' required><input name='price' placeholder='Price' type='number' class='w-full p-2 border rounded mb-2' required><select name='cat' class='w-full p-2 border rounded mb-2'><option>Fashion</option><option>Electronics</option><option>Food</option><option>Beauty</option></select><input type='file' name='file' class='w-full mb-2'><input name='img_url' placeholder='OR paste image URL' class='w-full p-2 border rounded mb-2'><button class='w-full bg-black text-white py-2 rounded-full'>Add Product</button></form></div><div class='bg-white p-4 rounded-xl mt-4'><table class='w-full'>"+rows+"</table></div>"
-    if not request.args.get("pwd"):
-        html="<form method='POST'><input name='pwd' type='password' placeholder='admin123' class='w-full p-3 border rounded'><button class='w-full mt-2 bg-black text-white py-2 rounded'>Login</button></form>"
-    return base_html("Admin", html)
-
-if __name__=="__main__":
-    app.run(host="0.0.0.0", port=10000)
-@app.route("/about")
-def about():
-    return base_html("About Us", "<div class='bg-white p-6 rounded-xl'><h1 class='font-black text-xl'>About ToolMillMALL.GH</h1><p class='mt-4 text-sm leading-6'>ToolMillMALL.GH is Ghana's trusted online marketplace founded in 2024 in Accra. We provide authentic Electronics, Fashion, Groceries and Home Appliances at affordable prices. Our mission is to make online shopping easy for every Ghanaian with Pay on Delivery and Mobile Money. We deliver to Accra, Kumasi, Takoradi, Tamale within 24-48 hours. Customer satisfaction is our priority.</p></div>")
-
-@app.route("/contact")
-def contact():
-    return base_html("Contact", "<div class='bg-white p-6 rounded-xl'><h1 class='font-bold'>Contact Us</h1><p class='mt-4 text-sm'>WhatsApp: 0556023536<br>Email: toolmillgh@gmail.com<br>Location: Accra, Greater Accra<br>Hours: Mon-Sat 8am-6pm</p><a href='https://wa.me/233556023536' class='mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded-full'>Chat on WhatsApp</a></div>")
-
-@app.route("/privacy")
-def privacy():
-    return base_html("Privacy Policy", "<div class='bg-white p-6 rounded-xl text-xs leading-5'><h1 class='font-bold text-lg'>Privacy Policy</h1><p class='mt-4'>At ToolMillMALL.GH we respect your privacy. We collect only name, phone, address for order delivery. We never share your data. We use cookies for cart. Mobile Money transactions are secure via MTN/Vodafone. You can request data deletion via WhatsApp 0556023536.</p></div>")
-
-@app.route("/shipping")
-def shipping():
-    return base_html("Shipping", "<div class='bg-white p-6 rounded-xl text-sm'><h1 class='font-bold'>Shipping & Returns</h1><p class='mt-4'>Free delivery in Accra over GHS 500. Standard delivery GHS 30-50. Delivery 1-2 days Accra, 2-4 days other regions. 7 days return for defective items.</p></div>")
+        grid += f"<div class='bg-white rounded-xl shadow overflow-hidden'><a href='/product/{p['id']}'><img src='{p['img']}' class='w-full h-40 object-cover'></a><div class='p-3'><a href='/product/{p['id']}'><h3 class='font-bold text-xs h-10 overflow-hidden leading-4'>{p['name']}</h3></a><p class='text-[10px] text-gray-500 h-8 overflow-hidden mt-1'>{p['desc'][:60]}...</p><div class='flex gap-1 mt-1 items-center'><b class='text-blue-700 text-sm'>GHS {p['price']}</b><span class='text-[10px] line-through text-gray-400'>GHS {p['old']}</span></div><a href='/add/{p['id']}' class='mt-2 block text-center bg-orange-500 text-white py-2 rounded-full text-xs
